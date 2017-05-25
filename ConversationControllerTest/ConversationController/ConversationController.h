@@ -11,6 +11,11 @@
 
 //#import "ConversationItemIndex.h"
 
+typedef NS_ENUM(NSInteger, ConversationControllerConversationFlow) {
+    ConversationControllerConversationFlowDefault,
+    ConversationControllerConversationFlowNewestTop
+};
+
 @interface NSIndexPath (ConversationController)
 
 -(NSInteger)conversationLevel;
@@ -27,7 +32,7 @@
 
 @end
 
-@protocol ConversationControllerDelegate <NSObject>
+@protocol ConversationControllerDelegate <NSObject, UIScrollViewDelegate>
 
 -(NSInteger)numRootItemsConversationController:(ConversationController*)controller;
 -(NSInteger)conversationController:(ConversationController*)controller numItemsForIndex:(NSIndexPath*)conversationIndex;
@@ -38,17 +43,27 @@
 
 -(UITableViewCell<ConversationTableCell>*)conversationController:(ConversationController*) controller cellAtConversationIndex:(NSIndexPath*)conversationIndex;
 
+@optional
+-(BOOL)conversationController:(ConversationController*) controller canReplyToConversationItemAtIndex:(NSIndexPath*)conversationIndex;
+
+-(CGFloat)conversationController:(ConversationController*) controller estimatedHeightForConversationIndex:(NSIndexPath *)conversationIndex;
+
+-(void)conversationController:(ConversationController*) controller prefetchDataForConversationIndex:(NSIndexPath*)conversationIndex isReply:(BOOL)isReply isExpandConversation:(BOOL)isExpand;
+
 @end
 
-@interface ConversationController : NSObject <UITableViewDataSource, UITableViewDelegate>
+@interface ConversationController : NSObject <UITableViewDataSource, UITableViewDelegate, UITableViewDataSourcePrefetching>
 
 @property (nonatomic, weak) id<ConversationControllerDelegate> delegate;
-@property (nonatomic, weak) UITableView* tableView;
+@property (nonatomic, weak, readonly) UITableView* tableView;
+@property (nonatomic, assign) ConversationControllerConversationFlow rootElementsFlow;
 
-- (instancetype)initWithLevels:(NSInteger)levels;
+- (instancetype)initWithTableView:(UITableView*)tableView levels:(NSInteger)levels;
 
 -(void)expandConversationAtIndex:(NSIndexPath*)conversationIndex byNItems:(NSInteger)nItems;
 -(void)conversationElementAddedAtRoot;
 -(void)conversationElementAddedAtParentConversationIndex:(NSIndexPath*)conversationIndex;
+
+-(void)refreshDisplayAtConversationIndex:(NSIndexPath*)conversationIndex;
 
 @end

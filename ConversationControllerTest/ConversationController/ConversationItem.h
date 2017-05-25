@@ -19,6 +19,7 @@
 @property (nonatomic, assign, readonly) NSInteger childCount;
 @property (nonatomic, assign, readonly) BOOL hasChilds;
 @property (nonatomic, assign, readonly) BOOL isExpanded;
+@property (nonatomic, assign) BOOL isReplyable;
 
 
 -(void)showMore:(NSInteger)howMany;

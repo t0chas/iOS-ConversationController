@@ -78,6 +78,7 @@
 
 @interface ConversationController ()
 
+@property (nonatomic, strong) UITableView* tableView;
 @property (nonatomic, assign) NSInteger levels;
 @property (nonatomic, strong) NSMutableArray<ConversationItem*>* rootLevel;
 @property (nonatomic, strong) NSMutableArray<NSMutableArray<ConversationMappingItem*>*>* displayMapping;
@@ -86,12 +87,16 @@
 
 @implementation ConversationController
 
-- (instancetype)initWithLevels:(NSInteger)levels
+- (instancetype)initWithTableView:(UITableView *)tableView levels:(NSInteger)levels
 {
     self = [super init];
     if (self) {
         self.levels = levels;
         self.rootLevel = [NSMutableArray new];
+        self.tableView = tableView;
+        self.tableView.delegate = self;
+        self.tableView.dataSource = self;
+        self.tableView.prefetchDataSource = self;
     }
     return self;
 }
@@ -114,16 +119,22 @@
 }
 
 -(void)conversationElementAddedAtRoot{
-    //[self loadConversation];
-    NSIndexPath* conversationIndex = [NSIndexPath indexPathWithIndex:self.rootLevel.count];
+    [self conversationElementAddedAtRootIndex:self.rootLevel.count];
+}
+
+-(void)conversationElementAddedAtRootIndex:(NSInteger)index{
+    NSIndexPath* conversationIndex = [NSIndexPath indexPathWithIndex:index];
     ConversationItem* item = [self loadItemAtIndex:conversationIndex];
     [self.rootLevel addObject:item];
     [self.displayMapping addObject:[NSMutableArray new]];
     [self updateSectionMappingForIndex:conversationIndex];
     
-    NSInteger rootLevelIdx = [conversationIndex indexAtPosition:0];
-    NSIndexSet* set = [NSIndexSet indexSetWithIndex:rootLevelIdx];
+    NSInteger section = [self sectionNumberForRootIndex:index];
+    NSIndexSet* set = [NSIndexSet indexSetWithIndex:section];
+    
+    [self.tableView beginUpdates];
     [self.tableView insertSections:set withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableView endUpdates];
 }
 
 -(void)conversationElementAddedAtParentConversationIndex:(NSIndexPath*)conversationIndex{
@@ -131,7 +142,22 @@
         [self conversationElementAddedAtRoot];
         return;
     }
-    [self rebuildConversationAtIndex:conversationIndex];
+    NSIndexPath* parentIndex = [conversationIndex indexPathByRemovingLastIndex];
+    ConversationItem* parentItem = [self conversationItemAtIndex:parentIndex];
+    if(!parentItem)
+        return;
+    ConversationItem* chidlItem = [self loadItemAtIndex:conversationIndex];
+    [parentItem.childs addObject:chidlItem];
+    [parentItem showMore:1];
+    [self updateSectionMappingForIndex:parentIndex];
+    
+    ConversationMappingItem* mapping = [self mappingFromConversationIndex:conversationIndex];
+    if(!mapping)
+        return;
+    [self.tableView beginUpdates];
+    NSArray* indexes = @[ mapping.displayIndex ];
+    [self.tableView insertRowsAtIndexPaths:indexes withRowAnimation:UITableViewRowAnimationTop];
+    [self.tableView endUpdates];
 }
 
 -(void)conversationElementRemovedAtConversationIndex:(NSIndexPath*)conversationIndex{
@@ -144,15 +170,19 @@
     NSMutableArray<ConversationMappingItem*>* sectionMapping = [self.displayMapping objectAtIndex:rootLevelIdx];
     [sectionMapping removeAllObjects];
     ConversationItem* rootItem = [self.rootLevel objectAtIndex:rootLevelIdx];
-    [self collapseConversationItem:rootItem section:rootLevelIdx sectionMapping:sectionMapping];
+    NSInteger section = [self sectionNumberForRootIndex:rootLevelIdx];
+    [self collapseConversationItem:rootItem section:section sectionMapping:sectionMapping];
 }
 
 -(void)updateTableSectionForIndex:(NSIndexPath*)conversationIndex{
     NSInteger rootLevelIdx = [conversationIndex indexAtPosition:0];
+    NSInteger section = [self sectionNumberForRootIndex:rootLevelIdx];
     NSInteger numOfSectionsInTable = self.tableView.numberOfSections;
-    if(rootLevelIdx >= numOfSectionsInTable)
+    if(section >= numOfSectionsInTable)
         return;
-    NSIndexSet* set = [NSIndexSet indexSetWithIndex:rootLevelIdx];
+    if(section < 0)
+        return;
+    NSIndexSet* set = [NSIndexSet indexSetWithIndex:section];
     [self.tableView reloadSections:set withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
@@ -229,11 +259,38 @@
     return item;
 }
 
+-(NSInteger)sectionNumberForRootIndex:(NSInteger)rootIdx{
+    NSInteger section = 0;
+    NSInteger rootCount = self.rootLevel.count;
+    if(self.rootElementsFlow == ConversationControllerConversationFlowDefault){
+        section = rootIdx;
+    }else{
+        section = rootCount - rootIdx - 1;
+    }
+    return section;
+}
+
+-(NSInteger)rootIndexFromSectionNumber:(NSInteger)section{
+    NSInteger rootIdx = 0;
+    if(self.rootElementsFlow == ConversationControllerConversationFlowDefault){
+        rootIdx = section;
+    }else{
+        rootIdx = self.rootLevel.count - section - 1;
+    }
+    return rootIdx;
+}
+
+-(ConversationItem*)rootItemForSection:(NSInteger)section{
+    NSInteger rootIdx = [self rootIndexFromSectionNumber:section];
+    ConversationItem* rootItem = [self.rootLevel objectAtIndex:rootIdx];
+    return rootItem;
+}
+
 -(void)collapseConversation{
     self.displayMapping = [NSMutableArray new];
     for(int i=0; i< self.rootLevel.count; i++){
+        ConversationItem* rootItem = [self rootItemForSection:i];
         NSMutableArray<ConversationMappingItem*>* sectionMapping = [NSMutableArray new];
-        ConversationItem* rootItem = [self.rootLevel objectAtIndex:i];
         [self collapseConversationItem:rootItem section:i sectionMapping:sectionMapping];
         [self.displayMapping addObject:sectionMapping];
     }
@@ -256,24 +313,60 @@
         }
     }
     NSInteger level = item.conversationLevel;
-    if(level < self.levels -1){
+    if([self.delegate respondsToSelector:@selector(conversationController:canReplyToConversationItemAtIndex:)]){
+        item.isReplyable = [self.delegate conversationController:self canReplyToConversationItemAtIndex:item.conversationIndex];
+    }
+    NSLog(@"item: %@ isReplyable: %li", item.conversationIndex, (long)item.isReplyable);
+    if(item.isReplyable && level < self.levels -1){
         ConversationMappingItem* replyItem = [ConversationMappingItem mappingWithReplyConversationIndex:item.conversationIndex displayRow:sectionMapping.count displaySection:section];
         [sectionMapping addObject:replyItem];
     }
 }
 
+-(NSArray<ConversationMappingItem*>*)sectionMappingForSection:(NSInteger)section{
+    NSInteger rootIdx = [self rootIndexFromSectionNumber:section];
+    NSArray<ConversationMappingItem*>* sectionMapping = [self.displayMapping objectAtIndex:rootIdx];
+    return sectionMapping;
+}
+
 -(ConversationMappingItem*)mappingFromDisplayIndex:(NSIndexPath*)displayIndex{
     if(!self.displayMapping)
         return nil;
-    NSArray* sectionMapping = [self.displayMapping objectAtIndex:displayIndex.section];
+    NSArray<ConversationMappingItem*>* sectionMapping = [self sectionMappingForSection:displayIndex.section];
     ConversationMappingItem* item = [sectionMapping objectAtIndex:displayIndex.row];
+#warning This is a Hack due to -collapseConversationItem:section: when invocked from -updateSectionMappingForIndex: will leave the other sections with a wrong section number. a linked list with recursive section evaluation or reindexing is required.
+    if(item)
+        item.displayIndex = displayIndex;
     return item;
 }
+
+-(ConversationMappingItem*)mappingFromConversationIndex:(NSIndexPath*)conversationIndex{
+    if(!self.displayMapping)
+        return nil;
+    NSInteger rootIdx = [conversationIndex indexAtPosition:0];
+    NSArray<ConversationMappingItem*>* sectionMapping = [self.displayMapping objectAtIndex:rootIdx];
+    for (ConversationMappingItem* item in sectionMapping) {
+        if([item.conversationIndex isEqual:conversationIndex]){
+            return item;
+        }
+    }
+    return nil;
+}
+                                                                     
 
 -(void)processCell:(UITableViewCell<ConversationTableCell>*)cell withConversationMappingItem:(ConversationMappingItem*)mappingItem{
     cell.controller = self;
     cell.conversationIndex = mappingItem.conversationIndex;
     cell.displayIndex = mappingItem.displayIndex;
+}
+
+-(void)refreshDisplayAtConversationIndex:(NSIndexPath*)conversationIndex{
+    ConversationMappingItem* item = [self mappingFromConversationIndex:conversationIndex];
+    if(!item)
+        return;
+    if(!item.displayIndex)
+        return;
+    [self.tableView reloadRowsAtIndexPaths:@[item.displayIndex] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 #pragma mark UITableViewDataSource
@@ -290,7 +383,7 @@
         return 0;
     if(!self.displayMapping)
         return 0;
-    NSArray* sectionMapping = [self.displayMapping objectAtIndex:section];
+    NSArray<ConversationMappingItem*>* sectionMapping = [self sectionMappingForSection:section];
     return sectionMapping.count;
 }
 
@@ -309,13 +402,49 @@
     }
     cell = [self.delegate conversationController:self cellAtConversationIndex:item.conversationIndex];
     [self processCell:cell withConversationMappingItem:item];
+    if(!cell)
+        return [[UITableViewCell alloc] init];
     return cell;
+}
+
+#pragma mark UITableViewDataSourcePrefetching
+- (void)tableView:(UITableView *)tableView prefetchRowsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths{
+    if(!self.delegate)
+        return;
+    if(![self.delegate respondsToSelector:@selector(conversationController:prefetchDataForConversationIndex:isReply:isExpandConversation:)])
+        return;
+    for (NSIndexPath* indexPath in indexPaths) {
+        ConversationMappingItem* item = [self mappingFromDisplayIndex:indexPath];
+        [self.delegate conversationController:self prefetchDataForConversationIndex:item.conversationIndex isReply:item.isReplyToConversationCell isExpandConversation:item.isExpandConversationCell];
+    }
 }
 
 #pragma mark UITableViewDelegate
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+/*- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     return UITableViewAutomaticDimension;
+}*/
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
+    if(self.delegate && [self.delegate respondsToSelector:@selector(scrollViewWillBeginDragging:)]){
+        [self.delegate scrollViewWillBeginDragging:scrollView];
+    }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if(self.delegate && [self.delegate respondsToSelector:@selector(scrollViewDidScroll:)]){
+        [self.delegate scrollViewDidScroll:scrollView];
+    }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    ConversationMappingItem* item = [self mappingFromDisplayIndex:indexPath];
+    if (item && self.delegate && [self.delegate respondsToSelector:@selector(conversationController:estimatedHeightForConversationIndex:)]) {
+        return [self.delegate conversationController:self estimatedHeightForConversationIndex:item.conversationIndex];
+    }
+    if(self.tableView.estimatedRowHeight > 0)
+        return self.tableView.estimatedRowHeight;
+    return 44.0f;
 }
 
 @end

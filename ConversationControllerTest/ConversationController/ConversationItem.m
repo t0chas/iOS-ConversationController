@@ -25,6 +25,7 @@
     self = [super init];
     if (self) {
         self.showingN = 3;
+        self.isReplyable = YES;
     }
     return self;
 }
