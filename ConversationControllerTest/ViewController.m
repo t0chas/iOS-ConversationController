@@ -121,11 +121,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self buildConversation];
-    self.conversationCntroller = [[ConversationController alloc] initWithLevels:2];
+    self.conversationCntroller = [[ConversationController alloc] initWithTableView:self.tableView levels:2];
     self.conversationCntroller.delegate = self;
-    self.conversationCntroller.tableView = self.tableView;
-    self.tableView.dataSource = self.conversationCntroller;
-    self.tableView.delegate = self.conversationCntroller;
 }
 
 
