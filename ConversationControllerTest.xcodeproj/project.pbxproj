@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D8E313E1ED8843D00090ED4 /* TSLinkedList.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E313D1ED8843D00090ED4 /* TSLinkedList.m */; };
+		7D8E31411ED8845000090ED4 /* TSLinkedListItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E31401ED8845000090ED4 /* TSLinkedListItem.m */; };
+		7D8E31491ED8953700090ED4 /* ConversationControllerUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E31481ED8953700090ED4 /* ConversationControllerUnitTests.m */; };
 		7DC91F421E14793B000272DF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC91F411E14793B000272DF /* main.m */; };
 		7DC91F451E14793B000272DF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC91F441E14793B000272DF /* AppDelegate.m */; };
 		7DC91F481E14793B000272DF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC91F471E14793B000272DF /* ViewController.m */; };
@@ -21,7 +24,24 @@
 		7DC91F6E1E15995E000272DF /* CommentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC91F6D1E15995E000272DF /* CommentCell.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		7D8E314B1ED8953700090ED4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7DC91F351E14793B000272DF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7DC91F3C1E14793B000272DF;
+			remoteInfo = ConversationControllerTest;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		7D8E313C1ED8843D00090ED4 /* TSLinkedList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSLinkedList.h; path = ConversationController/DataStructures/TSLinkedList.h; sourceTree = "<group>"; };
+		7D8E313D1ED8843D00090ED4 /* TSLinkedList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSLinkedList.m; path = ConversationController/DataStructures/TSLinkedList.m; sourceTree = "<group>"; };
+		7D8E313F1ED8845000090ED4 /* TSLinkedListItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSLinkedListItem.h; path = ConversationController/DataStructures/TSLinkedListItem.h; sourceTree = "<group>"; };
+		7D8E31401ED8845000090ED4 /* TSLinkedListItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSLinkedListItem.m; path = ConversationController/DataStructures/TSLinkedListItem.m; sourceTree = "<group>"; };
+		7D8E31461ED8953700090ED4 /* ConversationControllerUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConversationControllerUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D8E31481ED8953700090ED4 /* ConversationControllerUnitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConversationControllerUnitTests.m; sourceTree = "<group>"; };
+		7D8E314A1ED8953700090ED4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7DC91F3D1E14793B000272DF /* ConversationControllerTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConversationControllerTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DC91F411E14793B000272DF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7DC91F431E14793B000272DF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -47,6 +67,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7D8E31431ED8953700090ED4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7DC91F3A1E14793B000272DF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -57,10 +84,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7D8E313B1ED8841400090ED4 /* DataStructures */ = {
+			isa = PBXGroup;
+			children = (
+				7D8E313C1ED8843D00090ED4 /* TSLinkedList.h */,
+				7D8E313D1ED8843D00090ED4 /* TSLinkedList.m */,
+				7D8E313F1ED8845000090ED4 /* TSLinkedListItem.h */,
+				7D8E31401ED8845000090ED4 /* TSLinkedListItem.m */,
+			);
+			name = DataStructures;
+			sourceTree = "<group>";
+		};
+		7D8E31471ED8953700090ED4 /* ConversationControllerUnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				7D8E31481ED8953700090ED4 /* ConversationControllerUnitTests.m */,
+				7D8E314A1ED8953700090ED4 /* Info.plist */,
+			);
+			path = ConversationControllerUnitTests;
+			sourceTree = "<group>";
+		};
 		7DC91F341E14793B000272DF = {
 			isa = PBXGroup;
 			children = (
 				7DC91F3F1E14793B000272DF /* ConversationControllerTest */,
+				7D8E31471ED8953700090ED4 /* ConversationControllerUnitTests */,
 				7DC91F3E1E14793B000272DF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -69,6 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				7DC91F3D1E14793B000272DF /* ConversationControllerTest.app */,
+				7D8E31461ED8953700090ED4 /* ConversationControllerUnitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,6 +151,7 @@
 		7DC91F571E147A61000272DF /* ConversationController */ = {
 			isa = PBXGroup;
 			children = (
+				7D8E313B1ED8841400090ED4 /* DataStructures */,
 				7DC91F581E147A95000272DF /* ConversationBaseCell.h */,
 				7DC91F591E147A95000272DF /* ConversationBaseCell.m */,
 				7DC91F5C1E147B4A000272DF /* ConversationController.h */,
@@ -128,6 +178,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7D8E31451ED8953700090ED4 /* ConversationControllerUnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7D8E314D1ED8953700090ED4 /* Build configuration list for PBXNativeTarget "ConversationControllerUnitTests" */;
+			buildPhases = (
+				7D8E31421ED8953700090ED4 /* Sources */,
+				7D8E31431ED8953700090ED4 /* Frameworks */,
+				7D8E31441ED8953700090ED4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7D8E314C1ED8953700090ED4 /* PBXTargetDependency */,
+			);
+			name = ConversationControllerUnitTests;
+			productName = ConversationControllerUnitTests;
+			productReference = 7D8E31461ED8953700090ED4 /* ConversationControllerUnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		7DC91F3C1E14793B000272DF /* ConversationControllerTest */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7DC91F541E14793B000272DF /* Build configuration list for PBXNativeTarget "ConversationControllerTest" */;
@@ -154,6 +222,12 @@
 				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Alejandro Santiago";
 				TargetAttributes = {
+					7D8E31451ED8953700090ED4 = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = CK4G837GQS;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 7DC91F3C1E14793B000272DF;
+					};
 					7DC91F3C1E14793B000272DF = {
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = CK4G837GQS;
@@ -175,11 +249,19 @@
 			projectRoot = "";
 			targets = (
 				7DC91F3C1E14793B000272DF /* ConversationControllerTest */,
+				7D8E31451ED8953700090ED4 /* ConversationControllerUnitTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		7D8E31441ED8953700090ED4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7DC91F3B1E14793B000272DF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -193,11 +275,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7D8E31421ED8953700090ED4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7D8E31491ED8953700090ED4 /* ConversationControllerUnitTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7DC91F391E14793B000272DF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				7DC91F481E14793B000272DF /* ViewController.m in Sources */,
+				7D8E31411ED8845000090ED4 /* TSLinkedListItem.m in Sources */,
 				7DC91F451E14793B000272DF /* AppDelegate.m in Sources */,
 				7DC91F6E1E15995E000272DF /* CommentCell.m in Sources */,
 				7DC91F421E14793B000272DF /* main.m in Sources */,
@@ -206,10 +297,19 @@
 				7DC91F6B1E1594BC000272DF /* ReplyCell.m in Sources */,
 				7DC91F5E1E147B4A000272DF /* ConversationController.m in Sources */,
 				7DC91F681E1594B2000272DF /* ExpandCell.m in Sources */,
+				7D8E313E1ED8843D00090ED4 /* TSLinkedList.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7D8E314C1ED8953700090ED4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7DC91F3C1E14793B000272DF /* ConversationControllerTest */;
+			targetProxy = 7D8E314B1ED8953700090ED4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		7DC91F491E14793B000272DF /* Main.storyboard */ = {
@@ -231,6 +331,36 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		7D8E314E1ED8953700090ED4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				DEVELOPMENT_TEAM = CK4G837GQS;
+				INFOPLIST_FILE = ConversationControllerUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.KTC.ConversationControllerUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ConversationControllerTest.app/ConversationControllerTest";
+			};
+			name = Debug;
+		};
+		7D8E314F1ED8953700090ED4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				DEVELOPMENT_TEAM = CK4G837GQS;
+				INFOPLIST_FILE = ConversationControllerUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.KTC.ConversationControllerUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ConversationControllerTest.app/ConversationControllerTest";
+			};
+			name = Release;
+		};
 		7DC91F521E14793B000272DF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -346,6 +476,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7D8E314D1ED8953700090ED4 /* Build configuration list for PBXNativeTarget "ConversationControllerUnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D8E314E1ED8953700090ED4 /* Debug */,
+				7D8E314F1ED8953700090ED4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		7DC91F381E14793B000272DF /* Build configuration list for PBXProject "ConversationControllerTest" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -362,6 +500,7 @@
 				7DC91F561E14793B000272DF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
