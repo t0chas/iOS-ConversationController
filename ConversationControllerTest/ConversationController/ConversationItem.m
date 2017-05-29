@@ -10,6 +10,12 @@
 
 @interface ConversationItem ()
 
+@property (nonatomic, weak) ConversationItem* parent;
+
+@property (nonatomic, strong) TSLinkedList* childs;
+
+@property (nonatomic, strong) NSIndexPath* conversationIndex;
+
 @property (nonatomic, assign) NSInteger showingN;
 
 @end
@@ -20,15 +26,30 @@
     self.showingN += howMany;
 }
 
-- (instancetype)init
+- (instancetype)initWithConversationIndex:(NSIndexPath *)conversationIndex
 {
     self = [super init];
     if (self) {
+        self.childs = [[TSLinkedList alloc] init];
+        self.conversationIndex = conversationIndex;
         self.showingN = 3;
         self.isReplyable = YES;
     }
     return self;
 }
+
+- (void)addChild:(ConversationItem *)item{
+    item.parent = self;
+    [self.childs addItem:item];
+}
+
+- (void)removeChild:(ConversationItem *)item{
+    if(item.parent != self)
+        return;
+    item.parent = nil;
+    [self.childs removeItem:item];
+}
+
 
 - (NSInteger)conversationLevel{
     return self.conversationIndex.length -1;

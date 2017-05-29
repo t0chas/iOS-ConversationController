@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TSLinkedList.h"
 
-@interface ConversationItem : NSObject
+@interface ConversationItem : TSLinkedListItem
 
-@property (nonatomic, strong) NSIndexPath* conversationIndex;
-@property (nonatomic, strong) NSMutableArray<ConversationItem*>* childs;
+@property (nonatomic, strong, readonly) NSIndexPath* conversationIndex;
+//@property (nonatomic, strong) NSMutableArray<ConversationItem*>* childs;
 
 @property (nonatomic, assign, readonly) NSInteger conversationLevel;
 
@@ -22,7 +23,12 @@
 @property (nonatomic, assign) BOOL isReplyable;
 
 
+- (instancetype)initWithConversationIndex:(NSIndexPath*)conversationIndex;
+
 -(void)showMore:(NSInteger)howMany;
 
+
+-(void)addChild:(ConversationItem*)item;
+-(void)removeChild:(ConversationItem*)item;
 
 @end

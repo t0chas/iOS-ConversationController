@@ -7,7 +7,9 @@
 //
 
 #import "ConversationController.h"
+#import "Conversation.h"
 #import "ConversationItem.h"
+#import "CCDisplayMapping.h"
 
 #pragma mark NSIndexPath (ConversationController)
 
@@ -19,69 +21,18 @@
 
 @end
 
-#pragma mark ConversationMappingItem
-
-@interface ConversationMappingItem : NSObject
-
-@property (nonatomic, assign, readonly) BOOL isExpandConversationCell;
-@property (nonatomic, assign, readonly) BOOL isReplyToConversationCell;
-@property (nonatomic, strong, readonly) NSIndexPath* conversationIndex;
-@property (nonatomic, strong, readonly) NSIndexPath* displayIndex;
-
-+(ConversationMappingItem*)mappingWithConversationIndex:(NSIndexPath*)conversationIndex displayIndex:(NSIndexPath*)displayIndex;
-+(ConversationMappingItem*)mappingWithConversationIndex:(NSIndexPath*)conversationIndex displayRow:(NSInteger)row displaySection:(NSInteger)section;
-+(ConversationMappingItem*)mappingWithExpandConversationIndex:(NSIndexPath*)conversationIndex  displayRow:(NSInteger)row displaySection:(NSInteger)section;
-+(ConversationMappingItem*)mappingWithReplyConversationIndex:(NSIndexPath*)conversationIndex  displayRow:(NSInteger)row displaySection:(NSInteger)section;
-
-@end
-
-@interface ConversationMappingItem ()
-
-@property (nonatomic, assign) BOOL isExpandConversationCell;
-@property (nonatomic, assign) BOOL isReplyToConversationCell;
-@property (nonatomic, strong) NSIndexPath* conversationIndex;
-@property (nonatomic, strong) NSIndexPath* displayIndex;
-
-@end
-
-@implementation ConversationMappingItem
-
-
-+ (ConversationMappingItem *)mappingWithConversationIndex:(NSIndexPath *)conversationIndex displayRow:(NSInteger)row displaySection:(NSInteger)section{
-    NSIndexPath* displayIndex = [NSIndexPath indexPathForRow:row inSection:section];
-    return [self mappingWithConversationIndex:conversationIndex displayIndex:displayIndex];
-}
-
-+ (ConversationMappingItem *)mappingWithConversationIndex:(NSIndexPath *)conversationIndex displayIndex:(NSIndexPath *)displayIndex{
-    ConversationMappingItem* mapping = [ConversationMappingItem new];
-    mapping.conversationIndex = conversationIndex;
-    mapping.displayIndex = displayIndex;
-    return mapping;
-}
-
-+ (ConversationMappingItem *)mappingWithExpandConversationIndex:(NSIndexPath *)conversationIndex displayRow:(NSInteger)row displaySection:(NSInteger)section{
-    ConversationMappingItem* mapping = [self mappingWithConversationIndex:conversationIndex displayRow:row displaySection:section];
-    mapping.isExpandConversationCell = YES;
-    return mapping;
-}
-
-+ (ConversationMappingItem *)mappingWithReplyConversationIndex:(NSIndexPath *)conversationIndex displayRow:(NSInteger)row displaySection:(NSInteger)section{
-    ConversationMappingItem* mapping = [self mappingWithConversationIndex:conversationIndex displayRow:row displaySection:section];
-    mapping.isReplyToConversationCell = YES;
-    return mapping;
-}
-
-
-@end
-
 #pragma mark ConversationController
-
+//ConversationDisplayMapping - section
+//  ConversationDisplayMappingItem - rows
 @interface ConversationController ()
 
 @property (nonatomic, strong) UITableView* tableView;
 @property (nonatomic, assign) NSInteger levels;
+
+@property (nonatomic, strong) Conversation* conversation;
+
 @property (nonatomic, strong) NSMutableArray<ConversationItem*>* rootLevel;
-@property (nonatomic, strong) NSMutableArray<NSMutableArray<ConversationMappingItem*>*>* displayMapping;
+@property (nonatomic, strong) CCDisplayMapping* displayMapping;
 
 @end
 
@@ -91,6 +42,7 @@
 {
     self = [super init];
     if (self) {
+        self.conversation = [[Conversation alloc] init];
         self.levels = levels;
         self.rootLevel = [NSMutableArray new];
         self.tableView = tableView;
@@ -109,7 +61,68 @@
     }
 }
 
--(void)expandConversationAtIndex:(NSIndexPath*)conversationIndex byNItems:(NSInteger)nItems{
+#pragma mark public methods
+
+#pragma mark Conversation tree structure
+-(void)loadConversation{
+    if(!self.delegate)
+        return;
+    NSInteger rootItemCount = [self.delegate numRootItemsConversationController:self];
+    NSIndexPath* conversationIndex = [[NSIndexPath alloc] init];
+    
+    NSIndexPath* childConversationIndex = nil;
+    for (NSUInteger i =0; i < rootItemCount; i++) {
+        childConversationIndex = [conversationIndex indexPathByAddingIndex:i];
+        ConversationItem* child = [self loadItemAtIndex:childConversationIndex];
+        [self.conversation addChild:child];
+    }
+    [self collapseConversation];
+}
+
+-(void)conversationElementAddedAtRoot{
+    NSUInteger count = self.conversation.count;
+    NSIndexPath* conversationIndex = [[NSIndexPath alloc] initWithIndex:count];
+    [self conversationElementAddedAtParentConversationIndex:conversationIndex];
+}
+
+-(void)conversationElementAddedAtParentConversationIndex:(NSIndexPath*)conversationIndex{
+    if(!conversationIndex)
+        return;
+    ConversationItem* item = [self loadItemAtIndex:conversationIndex];
+    [self.conversation insertItem:item atConversationIndex:conversationIndex];
+}
+
+-(ConversationItem*)loadItemAtIndex:(NSIndexPath*)conversationIndex{
+    if(!self.delegate)
+        return nil;
+    ConversationItem* item = [[ConversationItem alloc] initWithConversationIndex:conversationIndex];
+    
+    NSInteger level = [conversationIndex conversationLevel];
+    if(level < self.levels -1){
+        NSInteger childCount = [self.delegate conversationController:self numItemsForIndex:conversationIndex];
+        NSIndexPath* childConversationIndex = nil;
+        for (NSUInteger i =0; i < childCount; i++) {
+            childConversationIndex = [conversationIndex indexPathByAddingIndex:i];
+            ConversationItem* child = [self loadItemAtIndex:childConversationIndex];
+            [item addChild:child];
+        }
+    }
+    return item;
+}
+
+
+#pragma mark Display tree structure
+-(void)collapseConversation{
+    /*self.displayMapping = [NSMutableArray new];
+    for(int i=0; i< self.rootLevel.count; i++){
+        ConversationItem* rootItem = [self rootItemForSection:i];
+        NSMutableArray<ConversationMappingItem*>* sectionMapping = [NSMutableArray new];
+        [self collapseConversationItem:rootItem section:i sectionMapping:sectionMapping];
+        [self.displayMapping addObject:sectionMapping];
+    }*/
+}
+
+/*-(void)expandConversationAtIndex:(NSIndexPath*)conversationIndex byNItems:(NSInteger)nItems{
     ConversationItem* item = [self conversationItemAtIndex:conversationIndex];
     if(!item)
         return;
@@ -224,16 +237,6 @@
     return item;
 }
 
--(void)loadConversation{
-    if(!self.delegate)
-        return;
-    NSInteger rootItemCount = [self.delegate numRootItemsConversationController:self];
-    NSIndexPath* conversationIndex = [[NSIndexPath alloc] init];
-    NSMutableArray<ConversationItem*>* items = [self loadItemsParentIndex:conversationIndex itemCount:rootItemCount];
-    self.rootLevel = items;
-    [self collapseConversation];
-}
-
 -(NSMutableArray<ConversationItem*>*)loadItemsParentIndex:(NSIndexPath*)parentIndex itemCount:(NSInteger)itemCount{
     NSMutableArray<ConversationItem*>* items = [NSMutableArray new];
     for(int i=0; i < itemCount; i++){
@@ -242,21 +245,6 @@
         [items addObject:item];
     }
     return items;
-}
-
--(ConversationItem*)loadItemAtIndex:(NSIndexPath*)converstationIndex{
-    if(!self.delegate)
-        return nil;
-    ConversationItem* item = [ConversationItem new];
-    item.conversationIndex = converstationIndex;
-    NSMutableArray<ConversationItem*>* items = [NSMutableArray new];
-    NSInteger level = [converstationIndex conversationLevel];
-    if(level < self.levels -1){
-        NSInteger childCount = [self.delegate conversationController:self numItemsForIndex:converstationIndex];
-        items = [self loadItemsParentIndex:converstationIndex itemCount:childCount];
-    }
-    item.childs = items;
-    return item;
 }
 
 -(NSInteger)sectionNumberForRootIndex:(NSInteger)rootIdx{
@@ -284,16 +272,6 @@
     NSInteger rootIdx = [self rootIndexFromSectionNumber:section];
     ConversationItem* rootItem = [self.rootLevel objectAtIndex:rootIdx];
     return rootItem;
-}
-
--(void)collapseConversation{
-    self.displayMapping = [NSMutableArray new];
-    for(int i=0; i< self.rootLevel.count; i++){
-        ConversationItem* rootItem = [self rootItemForSection:i];
-        NSMutableArray<ConversationMappingItem*>* sectionMapping = [NSMutableArray new];
-        [self collapseConversationItem:rootItem section:i sectionMapping:sectionMapping];
-        [self.displayMapping addObject:sectionMapping];
-    }
 }
 
 -(void)collapseConversationItem:(ConversationItem*) item section:(NSInteger)section sectionMapping:(NSMutableArray<ConversationMappingItem*>*)sectionMapping{
