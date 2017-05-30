@@ -282,24 +282,170 @@
     XCTAssertTrue(idx == NSNotFound);
 }
 
+static NSInteger preformanceItemCount = 1000000;
+
+-(void)testArray_InsertPerformance {
+    // This is an example of a performance test case.
+    
+    [self measureBlock:^{
+        // Put the code you want to measure the time of here.
+        
+        NSMutableArray<TSLinkedListItem*>* array = [NSMutableArray new];
+        XCTAssertNotNil(array);
+        XCTAssertTrue(array.count == 0);
+        
+        for(int i=0; i< preformanceItemCount; i++){
+            //int otherIdx = ceilf((float)i * 0.5f);
+            TSLinkedListItem* item0 = [[TSLinkedListItem alloc] init];
+            [array addObject:item0];
+            //[array insertObject:item0 atIndex:otherIdx];
+        }
+        XCTAssertTrue(array.count == preformanceItemCount);
+        
+        TSLinkedListItem* item0 = [[TSLinkedListItem alloc] init];
+        [array addObject:item0];
+    }];
+}
+
 -(void)testLinkedList_InsertPerformance {
+    // This is an example of a performance test case.
+    
+    [self measureBlock:^{
+        // Put the code you want to measure the time of here.
+        
+        TSLinkedList* linkedList = [[TSLinkedList alloc] init];
+        XCTAssertNotNil(linkedList);
+        XCTAssertTrue(linkedList.count == 0);
+        
+        for(int i=0; i< preformanceItemCount; i++){
+            //int otherIdx = ceilf((float)i * 0.5f);
+            TSLinkedListItem* item0 = [[TSLinkedListItem alloc] init];
+            [linkedList addItem:item0];
+            //[linkedList insertItem:item0 atIndex:otherIdx];
+        }
+        XCTAssertTrue(linkedList.count == preformanceItemCount);
+        
+        TSLinkedListItem* item0 = [[TSLinkedListItem alloc] init];
+        [linkedList addItem:item0];
+    }];
+}
+
+-(void)testArray_IndexOfPerformance {
+    // This is an example of a performance test case.
+    
+    NSMutableArray<TSLinkedListItem*>* array = [NSMutableArray new];
+    XCTAssertNotNil(array);
+    XCTAssertTrue(array.count == 0);
+    
+    for(int i=0; i< preformanceItemCount; i++){
+        //
+        TSLinkedListItem* item0 = [[TSLinkedListItem alloc] init];
+        [array addObject:item0];
+        //[array insertObject:item0 atIndex:otherIdx];
+    }
+    XCTAssertTrue(array.count == preformanceItemCount);
+    
+    //NSInteger otherIdx = ceilf((float)array.count * 0.5f);
+    NSInteger otherIdx = array.count - 2;
+    if(otherIdx < 0)
+        otherIdx = 0;//*/
+    TSLinkedListItem* item = [array objectAtIndex:otherIdx];
+    
+    [self measureBlock:^{
+        // Put the code you want to measure the time of here.
+        NSInteger assertIdx = [array indexOfObject:item];
+        XCTAssertTrue(assertIdx == otherIdx);
+    }];
+}
+
+-(void)testLinkedList_IndexOfPerformance {
     // This is an example of a performance test case.
     
     TSLinkedList* linkedList = [[TSLinkedList alloc] init];
     XCTAssertNotNil(linkedList);
     XCTAssertTrue(linkedList.count == 0);
     
-    for(int i=0; i< 10000; i++){
+    for(int i=0; i< preformanceItemCount; i++){
+        //int otherIdx = ceilf((float)i * 0.5f);
         TSLinkedListItem* item0 = [[TSLinkedListItem alloc] init];
         [linkedList addItem:item0];
+        //[linkedList insertItem:item0 atIndex:otherIdx];
     }
-    XCTAssertTrue(linkedList.count == 10000);
+    XCTAssertTrue(linkedList.count == preformanceItemCount);
+    
+    //NSInteger otherIdx = ceilf((float)linkedList.count * 0.5f);
+    NSInteger otherIdx = linkedList.count - 2;
+    if(otherIdx < 0)
+        otherIdx = 0;//*/
+    TSLinkedListItem* item = [linkedList itemAtIndex:otherIdx];
     
     [self measureBlock:^{
         // Put the code you want to measure the time of here.
         
+        NSInteger assertIdx = [linkedList indexOfItem:item];
+        XCTAssertTrue(assertIdx == otherIdx);
+    }];
+}
+
+
+
+
+
+
+-(void)testArray_removeObjectPerformance {
+    // This is an example of a performance test case.
+    
+    NSMutableArray<TSLinkedListItem*>* array = [NSMutableArray new];
+    XCTAssertNotNil(array);
+    XCTAssertTrue(array.count == 0);
+    
+    for(int i=0; i< preformanceItemCount; i++){
+        //
+        TSLinkedListItem* item0 = [[TSLinkedListItem alloc] init];
+        [array addObject:item0];
+        //[array insertObject:item0 atIndex:otherIdx];
+    }
+    XCTAssertTrue(array.count == preformanceItemCount);
+    
+    //NSInteger otherIdx = ceilf((float)array.count * 0.5f);
+    NSInteger otherIdx = array.count - 2;
+    if(otherIdx < 0)
+        otherIdx = 0;//*/
+    TSLinkedListItem* item = [array objectAtIndex:otherIdx];
+    
+    [self measureBlock:^{
+        // Put the code you want to measure the time of here.
+        [array removeObject:item];
+        XCTAssertTrue(array.count == preformanceItemCount -1);
+    }];
+}
+
+-(void)testLinkedList_removeObjectPerformance {
+    // This is an example of a performance test case.
+    
+    TSLinkedList* linkedList = [[TSLinkedList alloc] init];
+    XCTAssertNotNil(linkedList);
+    XCTAssertTrue(linkedList.count == 0);
+    
+    for(int i=0; i< preformanceItemCount; i++){
+        //int otherIdx = ceilf((float)i * 0.5f);
         TSLinkedListItem* item0 = [[TSLinkedListItem alloc] init];
         [linkedList addItem:item0];
+        //[linkedList insertItem:item0 atIndex:otherIdx];
+    }
+    XCTAssertTrue(linkedList.count == preformanceItemCount);
+    
+    //NSInteger otherIdx = ceilf((float)linkedList.count * 0.5f);
+    NSInteger otherIdx = linkedList.count - 2;
+    if(otherIdx < 0)
+        otherIdx = 0;//*/
+    TSLinkedListItem* item = [linkedList itemAtIndex:otherIdx];
+    
+    [self measureBlock:^{
+        // Put the code you want to measure the time of here.
+        
+        [linkedList removeItem:item];
+        XCTAssertTrue(linkedList.count == preformanceItemCount -1);
     }];
 }
 
