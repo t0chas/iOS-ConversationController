@@ -7,6 +7,18 @@
 //
 
 #import "TSLinkedList.h"
+@interface TSLinkedListItem()
+{
+    @public TSLinkedListItem* _prev;
+    @public TSLinkedListItem* _next;
+}
+
+@end
+
+@implementation TSLinkedListItem
+
+
+@end
 
 @interface TSLinkedList ()
 
@@ -28,56 +40,60 @@
     return self;
 }
 
--(void)cleanItem:(TSLinkedListItem*)item{
+/*-(void)cleanItem:(TSLinkedListItem*)item{
     if(!item)
         return;
-    item.next = nil;
-    item.prev = nil;
-}
+    item->_next = nil;
+    item->_prev = nil;
+}*/
 
 - (void)addItem:(TSLinkedListItem *)item{
     if(!item)
         return;
-    [self cleanItem:item];
-    self.count++;
-    if(!self.first && !self.last){
-        self.first = item;
-        self.last = item;
+    item->_next = nil;
+    item->_prev = nil;
+    
+    self->_count++;
+    if(!self->_first && !self->_last){
+        self->_first = item;
+        self->_last = item;
     }else{
-        self.last.next = item;
-        item.prev = self.last;
-        self.last = item;
+        self->_last->_next = item;
+        item->_prev = self->_last;
+        self->_last = item;
     }
 }
 
 - (void)insertItem:(TSLinkedListItem *)item atIndex:(NSUInteger)index{
     if(!item)
         return;
-    [self cleanItem:item];
+    item->_next = nil;
+    item->_prev = nil;
+    
     if(index >= self.count){
         [self addItem:item];
         return;
     }
+    
     TSLinkedListItem* itemAtIdx = [self itemAtIndex:index];
-
-    item.prev = itemAtIdx.prev;
-    if(itemAtIdx.prev)
-        itemAtIdx.prev.next = item;
+    item->_prev = itemAtIdx->_prev;
+    if(itemAtIdx->_prev)
+        itemAtIdx->_prev->_next = item;
     if(index == 0){
-        self.first = item;
+        self->_first = item;
     }
     
     item.next = itemAtIdx;
     itemAtIdx.prev = item;
-    self.count++;
+    self->_count = self->_count + 1;
 }
 
 - (TSLinkedListItem*)itemAtIndex:(NSUInteger)index{
-    if(index >= self.count)
+    if(index >= self->_count)
         return nil;
-    TSLinkedListItem* item = self.first;
-    for (int i = 0; i < index; i++) {
-        item = item.next;
+    TSLinkedListItem* item = self->_first;
+    for (NSUInteger i = 0; i < index; i = i + 1) {
+        item = item->_next;
     }
     return item;
 }
@@ -85,16 +101,16 @@
 - (NSUInteger)indexOfItem:(TSLinkedListItem *)item{
     if(!item)
         return NSNotFound;
-    if(self.first == item)
+    if(self->_first == item)
         return 0;
-    if(self.last == item)
-        return self.count -1;
-    TSLinkedListItem* loopItem = self.first;
+    if(self->_last == item)
+        return self->_count -1;
+    TSLinkedListItem* loopItem = self->_first;
     NSUInteger idx = 0;
     while (loopItem != nil) {
         if(loopItem == item)
             return idx;
-        loopItem = loopItem.next;
+        loopItem = loopItem->_next;
         idx++;
     }
     return NSNotFound;
@@ -103,6 +119,8 @@
 - (void)removeItem:(TSLinkedListItem *)item{
     if(!item)
         return;
+    if(!item->_prev && !item->_next)
+        return;
     /*if(self.first == item && self.last == item){
         self.last = nil;
         self.first = nil;
@@ -110,24 +128,26 @@
         [self cleanItem:item];
         return;
     }//*/
-    if(self.last == item){
-        self.last = item.prev;
-        if(self.last)
-            self.last.next = nil;
+    if(self->_last == item){
+        self->_last = item->_prev;
+        if(self->_last)
+            self->_last->_next = nil;
     }
     if(self.first == item){
-        self.first = item.next;
-        if(self.first)
-            self.first.prev = nil;
+        self->_first = item->_next;
+        if(self->_first)
+            self->_first->_prev = nil;
     }
     
-    if(item.prev)
-        item.prev.next = item.next;
-    if(item.next)
-        item.next.prev = item.prev;
+    if(item->_prev)
+        item->_prev->_next = item->_next;
+    if(item->_next)
+        item->_next->_prev = item->_prev;
     
-    [self cleanItem:item];
-    self.count--;
+    item->_next = nil;
+    item->_prev = nil;
+    
+    self->_count--;
     return;
 }
 
