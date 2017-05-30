@@ -52,6 +52,8 @@
 }
 
 -(CCDisplayRowMappingItem*)rowMappingAtRow:(NSInteger)row{
+    if(row >= self.childs.count)
+        return nil;
     CCDisplayRowMappingItem* rowMapping = (CCDisplayRowMappingItem*)[self.childs objectAtIndex:row];
     return rowMapping;
 }

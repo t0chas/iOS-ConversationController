@@ -8,7 +8,7 @@
 
 #import "ConversationController.h"
 #import "Conversation.h"
-#import "ConversationItem.h"
+#import "ConversationItem+Protected.h"
 #import "CCDisplayMapping.h"
 
 #pragma mark NSIndexPath (ConversationController)
@@ -17,6 +17,10 @@
 
 - (NSInteger)conversationLevel{
     return self.length -1;
+}
+
+-(BOOL)isSection{
+    return self.length == 1;
 }
 
 @end
@@ -45,7 +49,7 @@
     if (self) {
         self.conversation = [[Conversation alloc] init];
         self.operationQueue = [[NSOperationQueue alloc] init];
-        self.operationQueue.maxConcurrentOperationCount = 2;
+        self.operationQueue.maxConcurrentOperationCount = 1;
         
         self.levels = levels;
         self.tableView = tableView;
@@ -116,27 +120,22 @@
             }
         }
     }];
-    NSOperation* mappingOperation = [self collapseConversationOperation];
+    NSOperation* mappingOperation = [self collapseConversationOperationCompletion:^{
+        [self refreshDisplay];
+    }];
     [mappingOperation addDependency:structureOperation];
     
     [self.operationQueue addOperation:structureOperation];
     [self.operationQueue addOperation:mappingOperation];
 }
 
-/*-(void)conversationElementAddedAtRoot{
-    NSUInteger count = 0;
-    @synchronized (self.conversation) {
-        count = self.conversation.count;
-    }
-    NSIndexPath* conversationIndex = [[NSIndexPath alloc] initWithIndex:count];
-    [self conversationElementAddedAtConversationIndex:conversationIndex];
-}*/
-
 -(void)conversationElementAddedAtConversationIndex:(NSIndexPath*)conversationIndex increaseItemsShowing:(BOOL)increaseItemsShowing{
     if(!conversationIndex)
         return;
+    
+    __block ConversationItem* item = nil;
     NSBlockOperation* structureOperation = [NSBlockOperation blockOperationWithBlock:^{
-        ConversationItem* item = [self loadItemAtIndex:conversationIndex];
+        item = [self loadItemAtIndex:conversationIndex];
         @synchronized (self.conversation) {
             [self.conversation insertItem:item atConversationIndex:conversationIndex];
             
@@ -148,7 +147,23 @@
     }];
     
     //Reload (re-collapse) entire section mapping
-    NSOperation* mappingOperation = [self collapseConversationOperation];
+    NSOperation* mappingOperation = [self collapseConversationOperationCompletion:^{
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if(!item)
+                return ;
+            if(!self.tableView)
+                return;
+            if([conversationIndex isSection]){
+                NSUInteger section = [item.displayIndex indexAtPosition:0];
+                NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:section];
+                [self.tableView insertSections:indexSet withRowAnimation:UITableViewRowAnimationTop];
+            }else{
+                NSArray* indexes = [item displayIndexes];
+                if(indexes && indexes.count > 0)
+                    [self.tableView insertRowsAtIndexPaths:indexes withRowAnimation:UITableViewRowAnimationTop];
+            }
+        }];
+    }];
     [mappingOperation addDependency:structureOperation];
     
     [self.operationQueue addOperation:structureOperation];
@@ -242,21 +257,21 @@
 
 #pragma mark Display tree structure
 -(NSOperation*)collapseConversationOperation{
+    return [self collapseConversationOperationCompletion:nil];
+}
+
+-(NSOperation*)collapseConversationOperationCompletion:(void(^)())completion{
     NSBlockOperation* collapseOperation = [NSBlockOperation blockOperationWithBlock:^{
         if(!self.displayMapping){
             self.displayMapping = [[CCDisplayMapping alloc] init];
         }
         [self.displayMapping clear];
         NSOperation* collapseSectionsOperation = [self collapseConversation:self.conversation intoDisplayMapping:self.displayMapping];
-        [self.operationQueue addOperation:collapseSectionsOperation];
-        [collapseSectionsOperation waitUntilFinished];
-        
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if(!self.tableView)
-                return;
-            [self.tableView reloadData];
+        [collapseSectionsOperation setCompletionBlock:^{
+            if(completion)
+                completion();
         }];
-        
+        [self.operationQueue addOperation:collapseSectionsOperation];
     }];
     return collapseOperation;
 }
@@ -332,16 +347,19 @@
     return collapseOperation;
 }//*/
 
--(void)collapseConversationItem:(ConversationItem*)conversationItem intoSectionMapping:(CCDisplaySectionMapping*)sectionMapping{
+-(NSArray<NSIndexPath*>*)collapseConversationItem:(ConversationItem*)conversationItem intoSectionMapping:(CCDisplaySectionMapping*)sectionMapping{
     if(!conversationItem)
-        return;
+        return nil;
     if(!sectionMapping)
-        return;
+        return nil;
+    
+    NSMutableArray<NSIndexPath*>* displayIndexes = [[NSMutableArray alloc] init];
     
     CCDisplayRowMappingItem* rowMappingItem = [CCDisplayRowMappingItem mappingItemForConversationIndex:conversationItem.conversationIndex];
     NSInteger row = sectionMapping.count;
     [sectionMapping insertRowMapping:rowMappingItem atRow:row];
     conversationItem.displayIndex = rowMappingItem.displayIndex;
+    [displayIndexes addObject:conversationItem.displayIndex];
     
     NSInteger level = conversationItem.conversationLevel;
     
@@ -351,15 +369,24 @@
             row = sectionMapping.count;
             [sectionMapping insertRowMapping:expandItem atRow:row];
             conversationItem.displayExpandIndex = expandItem.displayIndex;
+            [displayIndexes addObject:expandItem.displayIndex];
         }
         if(conversationItem.showingN > 0){
             NSInteger maxItems = MIN(conversationItem.showingN, conversationItem.childCount);
             NSInteger base = conversationItem.childCount - maxItems;
+            
+            NSMutableArray<NSIndexPath*>* allChildIndexes = [[NSMutableArray alloc] init];
+            
             for (NSUInteger i = 0; i < maxItems; i++) {
                 NSInteger childIdx = base + i;
                 ConversationItem* childItem = [conversationItem itemAtIndex:childIdx];
-                [self collapseConversationItem:childItem intoSectionMapping:sectionMapping];
+                NSArray<NSIndexPath*>* childIndexes = [self collapseConversationItem:childItem intoSectionMapping:sectionMapping];
+                [allChildIndexes addObjectsFromArray:childIndexes];
             }
+            
+            conversationItem.displayChildIndexes = allChildIndexes;
+            if(allChildIndexes.count > 0)
+                [displayIndexes addObjectsFromArray:allChildIndexes];
         }
     }
     
@@ -371,7 +398,9 @@
         row = sectionMapping.count;
         [sectionMapping insertRowMapping:replyItem atRow:row];
         conversationItem.displayReplyIndex = replyItem.displayIndex;
+        [displayIndexes addObject:replyItem.displayIndex];
     }
+    return displayIndexes;
 }
 
 #pragma mark NOT USED
@@ -401,16 +430,48 @@
     cell.displayIndex = rowMappingItem.displayIndex;
 }
 
+-(void)refreshDisplay{
+    
+    void(^reloadTable)() = ^{
+        if(!self.tableView)
+            return;
+        [self.tableView reloadData];
+    };
+    
+    NSOperationQueue* currentQueue = [NSOperationQueue currentQueue];
+    NSOperationQueue* mainQueue = [NSOperationQueue mainQueue];
+    if([mainQueue isEqual:currentQueue]){
+        reloadTable();
+    }else{
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            reloadTable();
+        }];
+    }
+}
+
 -(void)refreshDisplayAtConversationIndex:(NSIndexPath*)conversationIndex{
     CCDisplayRowMappingItem* item = [self mappingFromConversationIndex:conversationIndex];
     if(!item)
         return;
     if(!item.displayIndex)
         return;
+    
+    void(^reloadTable)() = ^{
 #warning might need to reload other dependent cells (reply, expand and so on)
-    if(!self.tableView)
-        return;
-    [self.tableView reloadRowsAtIndexPaths:@[item.displayIndex] withRowAnimation:UITableViewRowAnimationFade];
+        if(!self.tableView)
+            return;
+        [self.tableView reloadRowsAtIndexPaths:@[item.displayIndex] withRowAnimation:UITableViewRowAnimationFade];
+    };
+    
+    NSOperationQueue* currentQueue = [NSOperationQueue currentQueue];
+    NSOperationQueue* mainQueue = [NSOperationQueue mainQueue];
+    if([mainQueue isEqual:currentQueue]){
+        reloadTable();
+    }else{
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            reloadTable();
+        }];
+    }
 }
 
 /*
@@ -589,6 +650,8 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     CCDisplayRowMappingItem* item = [self mappingFromDisplayIndex:indexPath];
+    if(!item)
+        return [[UITableViewCell alloc] init];
     UITableViewCell<ConversationTableCell>* cell;
     if(item.isExpandConversationCell){
         cell = [self.delegate conversationController:self expandConversationCellForConversationIndex:item.conversationIndex];
@@ -615,6 +678,8 @@
         return;
     for (NSIndexPath* indexPath in indexPaths) {
         CCDisplayRowMappingItem* item = [self mappingFromDisplayIndex:indexPath];
+        if(!item)
+            continue;
         [self.delegate conversationController:self prefetchDataForConversationIndex:item.conversationIndex isReply:item.isReplyToConversationCell isExpandConversation:item.isExpandConversationCell];
     }
 }

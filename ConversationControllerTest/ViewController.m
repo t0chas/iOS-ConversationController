@@ -13,6 +13,8 @@
 #import "CommentCell.h"
 #import "ExpandCell.h"
 
+#include <stdlib.h>
+
 @implementation Comment
 
 - (instancetype)init
@@ -59,6 +61,28 @@
 }
 
 -(void)buildConversation{
+    //[self buildConversationBig];
+    [self buildConversationNormal];
+}
+
+-(NSInteger)randomMin:(NSInteger)min max:(NSInteger)max{
+    NSInteger delta = max - min;
+    NSInteger r = arc4random_uniform((uint)(delta + 1));
+    return min + r;
+}
+
+-(void)buildConversationBig{
+    self.comments = [NSMutableArray new];
+    
+    Comment* comment;
+    for (NSInteger i=0; i < 1000; i++) {
+        NSInteger replies = [self randomMin:2 max:1000];
+        comment = [self buildComment:[NSString stringWithFormat:@"Comment #%li", (long)i] nReplies:replies];
+        [self.comments addObject:comment];
+    }
+}
+
+-(void)buildConversationNormal{
     self.comments = [NSMutableArray new];
     
     Comment* comment;
@@ -125,6 +149,7 @@
     [super viewDidLoad];
     [self buildConversation];
     self.conversationCntroller = [[ConversationController alloc] initWithTableView:self.tableView levels:2];
+    self.conversationCntroller.rootElementsFlow = ConversationControllerConversationFlowNewestTop;
     self.conversationCntroller.delegate = self;
 }
 

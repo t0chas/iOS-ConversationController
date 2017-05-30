@@ -25,6 +25,11 @@
 
 @property (nonatomic, strong) NSMutableArray<ConversationItem*>* childs;
 
+@property (nonatomic, strong) NSIndexPath* displayIndex;
+@property (nonatomic, strong) NSIndexPath* displayExpandIndex;
+@property (nonatomic, strong) NSIndexPath* displayReplyIndex;
+@property (nonatomic, strong) NSArray<NSIndexPath*>* displayChildIndexes;
+
 @end
 
 #endif /* ConversationItem_Protected_h */

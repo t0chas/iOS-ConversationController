@@ -19,6 +19,7 @@ typedef NS_ENUM(NSInteger, ConversationControllerConversationFlow) {
 @interface NSIndexPath (ConversationController)
 
 -(NSInteger)conversationLevel;
+-(BOOL)isSection;
 
 @end
 

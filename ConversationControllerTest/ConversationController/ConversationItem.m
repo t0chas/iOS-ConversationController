@@ -18,6 +18,11 @@
 
 @property (nonatomic, assign) NSInteger showingN;
 
+@property (nonatomic, strong) NSIndexPath* displayIndex;
+@property (nonatomic, strong) NSIndexPath* displayExpandIndex;
+@property (nonatomic, strong) NSIndexPath* displayReplyIndex;
+@property (nonatomic, copy) NSArray<NSIndexPath*>* displayChildIndexes;
+
 @end
 
 @implementation ConversationItem
@@ -89,6 +94,19 @@
         return nil;
     NSIndexPath* childConversationIndex = [self.conversationIndex indexPathByAddingIndex:childIdx];
     return childConversationIndex;
+}
+
+-(NSArray<NSIndexPath*>*)displayIndexes{
+    NSMutableArray<NSIndexPath*>* indexes = [NSMutableArray new];
+    if(self.displayIndex)
+        [indexes addObject:self.displayIndex];
+    if(self.displayExpandIndex)
+        [indexes addObject:self.displayExpandIndex];
+    if(self.displayChildIndexes && self.displayChildIndexes.count)
+       [indexes addObjectsFromArray:self.displayChildIndexes];
+    if(self.displayReplyIndex)
+        [indexes addObject:self.displayReplyIndex];
+    return indexes;
 }
 
 - (NSInteger)conversationLevel{
