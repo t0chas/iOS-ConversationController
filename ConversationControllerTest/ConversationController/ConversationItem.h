@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "TSLinkedList.h"
 
-@interface ConversationItem : TSLinkedListItem
+@interface ConversationItem : NSObject /*TSLinkedListItem*/
+
+@property (nonatomic, weak, readonly) ConversationItem* parent;
 
 @property (nonatomic, strong, readonly) NSIndexPath* conversationIndex;
 //@property (nonatomic, strong) NSMutableArray<ConversationItem*>* childs;
@@ -22,6 +24,9 @@
 @property (nonatomic, assign, readonly) BOOL isExpanded;
 @property (nonatomic, assign) BOOL isReplyable;
 
+@property (nonatomic, strong) NSIndexPath* displayIndex;
+@property (nonatomic, strong) NSIndexPath* displayExpandIndex;
+@property (nonatomic, strong) NSIndexPath* displayReplyIndex;
 
 - (instancetype)initWithConversationIndex:(NSIndexPath*)conversationIndex;
 
@@ -30,5 +35,10 @@
 
 -(void)addChild:(ConversationItem*)item;
 -(void)removeChild:(ConversationItem*)item;
+-(void)insertChild:(ConversationItem*)item atIndex:(NSUInteger)index;
+
+- (ConversationItem *)itemAtIndex:(NSUInteger)index;
+
+-(void)setDirty;
 
 @end

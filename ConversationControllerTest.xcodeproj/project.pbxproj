@@ -8,11 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		7D8E313E1ED8843D00090ED4 /* TSLinkedList.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E313D1ED8843D00090ED4 /* TSLinkedList.m */; };
-		7D8E31411ED8845000090ED4 /* TSLinkedListItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E31401ED8845000090ED4 /* TSLinkedListItem.m */; };
 		7D8E31491ED8953700090ED4 /* ConversationControllerUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E31481ED8953700090ED4 /* ConversationControllerUnitTests.m */; };
 		7D8E31521ED8D43500090ED4 /* Conversation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E31511ED8D43500090ED4 /* Conversation.m */; };
 		7D8E31571EDC7C4800090ED4 /* CCDisplayMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E31561EDC7C4800090ED4 /* CCDisplayMapping.m */; };
-		7D8E315A1EDC7C5A00090ED4 /* CCDisplayMappingItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E31591EDC7C5A00090ED4 /* CCDisplayMappingItem.m */; };
+		7D8E315A1EDC7C5A00090ED4 /* CCDisplayRowMappingItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E31591EDC7C5A00090ED4 /* CCDisplayRowMappingItem.m */; };
 		7D8E315E1EDC802800090ED4 /* CCDisplaySectionMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E315D1EDC802800090ED4 /* CCDisplaySectionMapping.m */; };
 		7DC91F421E14793B000272DF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC91F411E14793B000272DF /* main.m */; };
 		7DC91F451E14793B000272DF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC91F441E14793B000272DF /* AppDelegate.m */; };
@@ -42,7 +41,6 @@
 		7D8E313C1ED8843D00090ED4 /* TSLinkedList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSLinkedList.h; path = ConversationController/DataStructures/TSLinkedList.h; sourceTree = "<group>"; };
 		7D8E313D1ED8843D00090ED4 /* TSLinkedList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSLinkedList.m; path = ConversationController/DataStructures/TSLinkedList.m; sourceTree = "<group>"; };
 		7D8E313F1ED8845000090ED4 /* TSLinkedListItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSLinkedListItem.h; path = ConversationController/DataStructures/TSLinkedListItem.h; sourceTree = "<group>"; };
-		7D8E31401ED8845000090ED4 /* TSLinkedListItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSLinkedListItem.m; path = ConversationController/DataStructures/TSLinkedListItem.m; sourceTree = "<group>"; };
 		7D8E31461ED8953700090ED4 /* ConversationControllerUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConversationControllerUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D8E31481ED8953700090ED4 /* ConversationControllerUnitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConversationControllerUnitTests.m; sourceTree = "<group>"; };
 		7D8E314A1ED8953700090ED4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -51,9 +49,9 @@
 		7D8E31531ED8E3B600090ED4 /* ConversationItem+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ConversationItem+Protected.h"; path = "ConversationController/ConversationItem+Protected.h"; sourceTree = "<group>"; };
 		7D8E31551EDC7C4800090ED4 /* CCDisplayMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCDisplayMapping.h; path = ConversationController/Internal/CCDisplayMapping.h; sourceTree = "<group>"; };
 		7D8E31561EDC7C4800090ED4 /* CCDisplayMapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCDisplayMapping.m; path = ConversationController/Internal/CCDisplayMapping.m; sourceTree = "<group>"; };
-		7D8E31581EDC7C5A00090ED4 /* CCDisplayMappingItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCDisplayMappingItem.h; path = ConversationController/Internal/CCDisplayMappingItem.h; sourceTree = "<group>"; };
-		7D8E31591EDC7C5A00090ED4 /* CCDisplayMappingItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCDisplayMappingItem.m; path = ConversationController/Internal/CCDisplayMappingItem.m; sourceTree = "<group>"; };
-		7D8E315B1EDC7CBF00090ED4 /* CCDisplayMappingItem+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CCDisplayMappingItem+Protected.h"; sourceTree = "<group>"; };
+		7D8E31581EDC7C5A00090ED4 /* CCDisplayRowMappingItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCDisplayRowMappingItem.h; path = ConversationController/Internal/CCDisplayRowMappingItem.h; sourceTree = "<group>"; };
+		7D8E31591EDC7C5A00090ED4 /* CCDisplayRowMappingItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCDisplayRowMappingItem.m; path = ConversationController/Internal/CCDisplayRowMappingItem.m; sourceTree = "<group>"; };
+		7D8E315B1EDC7CBF00090ED4 /* CCDisplayRowMappingItem+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CCDisplayRowMappingItem+Protected.h"; sourceTree = "<group>"; };
 		7D8E315C1EDC802800090ED4 /* CCDisplaySectionMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCDisplaySectionMapping.h; path = ConversationController/Internal/CCDisplaySectionMapping.h; sourceTree = "<group>"; };
 		7D8E315D1EDC802800090ED4 /* CCDisplaySectionMapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCDisplaySectionMapping.m; path = ConversationController/Internal/CCDisplaySectionMapping.m; sourceTree = "<group>"; };
 		7DC91F3D1E14793B000272DF /* ConversationControllerTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConversationControllerTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,7 +102,6 @@
 				7D8E313C1ED8843D00090ED4 /* TSLinkedList.h */,
 				7D8E313D1ED8843D00090ED4 /* TSLinkedList.m */,
 				7D8E313F1ED8845000090ED4 /* TSLinkedListItem.h */,
-				7D8E31401ED8845000090ED4 /* TSLinkedListItem.m */,
 			);
 			name = DataStructures;
 			sourceTree = "<group>";
@@ -125,9 +122,9 @@
 				7D8E31561EDC7C4800090ED4 /* CCDisplayMapping.m */,
 				7D8E315C1EDC802800090ED4 /* CCDisplaySectionMapping.h */,
 				7D8E315D1EDC802800090ED4 /* CCDisplaySectionMapping.m */,
-				7D8E31581EDC7C5A00090ED4 /* CCDisplayMappingItem.h */,
-				7D8E315B1EDC7CBF00090ED4 /* CCDisplayMappingItem+Protected.h */,
-				7D8E31591EDC7C5A00090ED4 /* CCDisplayMappingItem.m */,
+				7D8E31581EDC7C5A00090ED4 /* CCDisplayRowMappingItem.h */,
+				7D8E315B1EDC7CBF00090ED4 /* CCDisplayRowMappingItem+Protected.h */,
+				7D8E31591EDC7C5A00090ED4 /* CCDisplayRowMappingItem.m */,
 			);
 			name = Internal;
 			sourceTree = "<group>";
@@ -185,11 +182,11 @@
 				7DC91F591E147A95000272DF /* ConversationBaseCell.m */,
 				7DC91F5C1E147B4A000272DF /* ConversationController.h */,
 				7DC91F5D1E147B4A000272DF /* ConversationController.m */,
+				7D8E31501ED8D43500090ED4 /* Conversation.h */,
+				7D8E31511ED8D43500090ED4 /* Conversation.m */,
 				7DC91F5F1E147B60000272DF /* ConversationItem.h */,
 				7D8E31531ED8E3B600090ED4 /* ConversationItem+Protected.h */,
 				7DC91F601E147B60000272DF /* ConversationItem.m */,
-				7D8E31501ED8D43500090ED4 /* Conversation.h */,
-				7D8E31511ED8D43500090ED4 /* Conversation.m */,
 			);
 			name = ConversationController;
 			sourceTree = "<group>";
@@ -321,8 +318,7 @@
 			files = (
 				7D8E31521ED8D43500090ED4 /* Conversation.m in Sources */,
 				7DC91F481E14793B000272DF /* ViewController.m in Sources */,
-				7D8E315A1EDC7C5A00090ED4 /* CCDisplayMappingItem.m in Sources */,
-				7D8E31411ED8845000090ED4 /* TSLinkedListItem.m in Sources */,
+				7D8E315A1EDC7C5A00090ED4 /* CCDisplayRowMappingItem.m in Sources */,
 				7DC91F451E14793B000272DF /* AppDelegate.m in Sources */,
 				7DC91F6E1E15995E000272DF /* CommentCell.m in Sources */,
 				7DC91F421E14793B000272DF /* main.m in Sources */,
@@ -519,6 +515,7 @@
 				7D8E314F1ED8953700090ED4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7DC91F381E14793B000272DF /* Build configuration list for PBXProject "ConversationControllerTest" */ = {
 			isa = XCConfigurationList;

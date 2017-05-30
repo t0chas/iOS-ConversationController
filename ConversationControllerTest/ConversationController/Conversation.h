@@ -15,8 +15,13 @@
 @property (nonatomic, assign, readonly) NSUInteger count;
 
 -(void)addChild:(ConversationItem*)item;
+-(void)insertChild:(ConversationItem*)item atIndex:(NSUInteger)index;
 -(void)removeChild:(ConversationItem*)item;
 
 -(void)insertItem:(ConversationItem*)item atConversationIndex:(NSIndexPath*)conversationIndex;
+
+-(ConversationItem*)itemAtIndex:(NSUInteger)index;
+
+-(ConversationItem*)conversationItemAtConversationIndex:(NSIndexPath*)conversationIndex;
 
 @end

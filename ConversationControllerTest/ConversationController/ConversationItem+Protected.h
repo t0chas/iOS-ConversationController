@@ -13,16 +13,17 @@
 
 @protocol ConversationTree <NSObject>
 
-@property (nonatomic, strong) TSLinkedList* childs;
+@property (nonatomic, strong) NSMutableArray<ConversationItem*>* childs;
 
 -(void)addChild:(ConversationItem*)item;
+-(void)insertChild:(ConversationItem*)item atIndex:(NSUInteger)index;
 -(void)removeChild:(ConversationItem*)item;
 
 @end
 
 @interface ConversationItem (protected) <ConversationTree>
 
-@property (nonatomic, strong) TSLinkedList* childs;
+@property (nonatomic, strong) NSMutableArray<ConversationItem*>* childs;
 
 @end
 

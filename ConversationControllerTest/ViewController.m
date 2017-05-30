@@ -46,13 +46,16 @@
     Comment* newComment = [Comment new];
     newComment.message = self.txtNewComment.text;
     [self.comments addObject:newComment];
-    [self.conversationCntroller conversationElementAddedAtRoot];
+    NSIndexPath* conversationIndex = [NSIndexPath indexPathWithIndex:self.comments.count -1];
+    [self.conversationCntroller conversationElementAddedAtConversationIndex:conversationIndex increaseItemsShowing:NO];
 }
 
 - (void)addComment:(Comment *)comment toIndex:(NSIndexPath *)parentConversationIndex{
     Comment* parent = [self getComment:parentConversationIndex];
     [parent.replies addObject:comment];
-    [self.conversationCntroller conversationElementAddedAtParentConversationIndex:parentConversationIndex];
+    
+    NSIndexPath* conversationIndex = [parentConversationIndex indexPathByAddingIndex:parent.replies.count -1];
+    [self.conversationCntroller conversationElementAddedAtConversationIndex:conversationIndex increaseItemsShowing:YES];
 }
 
 -(void)buildConversation{

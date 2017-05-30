@@ -7,7 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TSLinkedListItem.h"
+#import "CCDisplayRowMappingItem.h"
 
-@interface CCDisplaySectionMapping : NSObject
+@interface CCDisplaySectionMapping : NSObject /*TSLinkedListItem*/
+
+@property (nonatomic, assign, readonly) NSInteger section;
+@property (nonatomic, assign, readonly) NSInteger count;
+
+- (instancetype)initWithSection:(NSInteger)section;
+
+-(void)insertRowMapping:(CCDisplayRowMappingItem*)rowMapping atRow:(NSInteger)row;
+
+-(CCDisplayRowMappingItem*)rowMappingAtRow:(NSInteger)row;
+
+-(void)clear;
 
 @end

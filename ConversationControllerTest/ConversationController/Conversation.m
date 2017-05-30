@@ -11,7 +11,7 @@
 
 @interface Conversation ()
 
-@property (nonatomic, strong) TSLinkedList* childs;
+@property (nonatomic, strong) NSMutableArray<ConversationItem*>* childs;
 
 @end
 
@@ -29,35 +29,65 @@
 {
     self = [super init];
     if (self) {
-        self.childs = [[TSLinkedList alloc] init];
+        self.childs = [NSMutableArray new];
     }
     return self;
 }
 
 - (void)addChild:(ConversationItem*)item{
-    [self.childs addItem:item];
+    [self.childs addObject:item];
+}
+
+- (void)insertChild:(ConversationItem *)item atIndex:(NSUInteger)index{
+    [self.childs insertObject:item atIndex:index];
+    [self setChildsDirtyFromIndex:index +1];
 }
 
 - (void)removeChild:(ConversationItem *)item{
-    [self.childs removeItem:item];
+    NSUInteger index = [self.childs indexOfObject:item];
+    if(index == NSNotFound)
+        return;
+    [self.childs removeObjectAtIndex:index];
+    [self setChildsDirtyFromIndex:index];
+}
+
+-(void)setChildsDirtyFromIndex:(NSUInteger)index{
+    ConversationItem* item = nil;
+    for (NSUInteger i= index; i < self.childs.count; i++) {
+        item = self.childs[index];
+        [item setDirty];
+    }
 }
 
 -(id<ConversationTree>)itemAtConversationIndex:(NSIndexPath*)conversationIndex{
     if(!conversationIndex)
         return nil;
     id<ConversationTree> item = self;
-    TSLinkedList* itemList = [item childs];
+    NSMutableArray<ConversationItem*>* itemList = [item childs];
     for(NSUInteger i = 0; i < conversationIndex.length; i++){
         NSUInteger idx = [conversationIndex indexAtPosition:i];
         if(idx >= itemList.count)
             return nil;
-        item = (id<ConversationTree>)[itemList itemAtIndex:idx];
+        item = (id<ConversationTree>)[itemList objectAtIndex:idx];
         if(!item)
             return nil;
         itemList = [item childs];
         if(!itemList)
             return nil;
     }
+    return item;
+}
+
+-(ConversationItem*)conversationItemAtConversationIndex:(NSIndexPath*)conversationIndex{
+    id<ConversationTree> item = [self itemAtConversationIndex:conversationIndex];
+    if(![item isKindOfClass:[ConversationItem class]])
+        return nil;
+    ConversationItem* conversationItem = (ConversationItem*)item;
+    return conversationItem;
+}
+
+- (ConversationItem *)itemAtIndex:(NSUInteger)index{
+    ConversationItem* item = (ConversationItem*)[self.childs objectAtIndex:index];
     return item;
 }
 
@@ -69,13 +99,7 @@
     id<ConversationTree> treeItemAtIndex = [self itemAtConversationIndex:parentConversationIndex];
     if(!treeItemAtIndex)
         return;
-    TSLinkedList* childs = [treeItemAtIndex childs];
-    [childs insertItem:item atIndex:lastIndex];
-    for(NSUInteger idx = lastIndex +1; idx < childs.count; idx++){
-        ConversationItem* item = (ConversationItem*)[childs itemAtIndex:idx];
-#warning TODO [item setDirty];
-        //[item setDirty];
-    }
+    [treeItemAtIndex insertChild:item atIndex:lastIndex];
 }
 
 @end

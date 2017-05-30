@@ -61,8 +61,8 @@ typedef NS_ENUM(NSInteger, ConversationControllerConversationFlow) {
 - (instancetype)initWithTableView:(UITableView*)tableView levels:(NSInteger)levels;
 
 -(void)expandConversationAtIndex:(NSIndexPath*)conversationIndex byNItems:(NSInteger)nItems;
--(void)conversationElementAddedAtRoot;
--(void)conversationElementAddedAtParentConversationIndex:(NSIndexPath*)conversationIndex;
+//-(void)conversationElementAddedAtRoot;
+-(void)conversationElementAddedAtConversationIndex:(NSIndexPath*)conversationIndex increaseItemsShowing:(BOOL)increaseItemsShowing;
 
 -(void)refreshDisplayAtConversationIndex:(NSIndexPath*)conversationIndex;
 

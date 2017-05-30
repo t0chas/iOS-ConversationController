@@ -7,7 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CCDisplaySectionMapping.h"
 
 @interface CCDisplayMapping : NSObject
+
+@property (nonatomic, assign, readonly) NSInteger count;
+
+-(void)addSectionMapping:(CCDisplaySectionMapping*)sectionMapping;
+-(void)insertSectionMapping:(CCDisplaySectionMapping*)sectionMapping atIndex:(NSUInteger)index;
+
+-(CCDisplaySectionMapping*)sectionMappingAtIndex:(NSInteger)index;
+
+-(void)clear;
 
 @end
