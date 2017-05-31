@@ -11,6 +11,7 @@
 @interface Comment : NSObject
 
 @property (nonatomic, strong) NSString* message;
+@property (nonatomic, assign) BOOL hasContent;
 @property (nonatomic, strong) NSMutableArray<Comment*>* replies;
 
 @end

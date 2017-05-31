@@ -289,6 +289,9 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
     if(!self.delegate)
         return nil;
     ConversationItem* item = [[ConversationItem alloc] initWithConversationIndex:conversationIndex];
+    if([self.delegate respondsToSelector:@selector(conversationController:conversationItemAtIndexHasContent:)]){
+        item.hasContent = [self.delegate conversationController:self conversationItemAtIndexHasContent:conversationIndex];
+    }
     
     if([self.delegate respondsToSelector:@selector(conversationController:canReplyToConversationItemAtIndex:)]){
         item.isReplyable = [self.delegate conversationController:self canReplyToConversationItemAtIndex:item.conversationIndex];
@@ -450,6 +453,14 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
     conversationItem.displayIndex = rowMappingItem.displayIndex;
     [displayIndexes addObject:conversationItem.displayIndex];
     
+    if(conversationItem.hasContent){
+        CCDisplayRowMappingItem* contentMappingItem = [CCDisplayRowMappingItem contentMappingItemForConversationIndex:conversationItem.conversationIndex];
+        row = sectionMapping.count;
+        [sectionMapping insertRowMapping:contentMappingItem atRow:row];
+        conversationItem.displayExpandIndex = contentMappingItem.displayIndex;
+        [displayIndexes addObject:contentMappingItem.displayIndex];
+    }
+    
     NSInteger level = conversationItem.conversationLevel;
     
     if(conversationItem.hasChilds){
@@ -594,12 +605,17 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
     if(!item)
         return [[UITableViewCell alloc] init];
     UITableViewCell<ConversationTableCell>* cell;
+    if(item.isContentConversationCell && [self.delegate respondsToSelector:@selector(conversationController:contentCellForConversationIndex:)]){
+        cell = [self.delegate conversationController:self contentCellForConversationIndex:item.conversationIndex];
+        [self processCell:cell withConversationMappingItem:item];
+        return cell;
+    }
     if(item.isExpandConversationCell){
         cell = [self.delegate conversationController:self expandConversationCellForConversationIndex:item.conversationIndex];
         [self processCell:cell withConversationMappingItem:item];
         return cell;
     }
-    if(item.isReplyToConversationCell){
+    if(item.isReplyToConversationCell && [self.delegate respondsToSelector:@selector(conversationController:replyCellForConversationIndex:)]){
         cell = [self.delegate conversationController:self replyCellForConversationIndex:item.conversationIndex];
         [self processCell:cell withConversationMappingItem:item];
         return cell;
@@ -621,7 +637,7 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
         CCDisplayRowMappingItem* item = [self mappingFromDisplayIndex:indexPath];
         if(!item)
             continue;
-        [self.delegate conversationController:self prefetchDataForConversationIndex:item.conversationIndex isReply:item.isReplyToConversationCell isExpandConversation:item.isExpandConversationCell];
+        [self.delegate conversationController:self prefetchDataForConversationIndex:item.conversationIndex isContent:item.isContentConversationCell isReply:item.isReplyToConversationCell isExpandConversation:item.isExpandConversationCell];
     }
 }
 

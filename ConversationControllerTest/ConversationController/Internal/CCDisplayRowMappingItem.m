@@ -13,6 +13,7 @@
 
 @interface CCDisplayRowMappingItem ()
 
+@property (nonatomic, assign) BOOL isContentConversationCell;
 @property (nonatomic, assign) BOOL isExpandConversationCell;
 @property (nonatomic, assign) BOOL isReplyToConversationCell;
 @property (nonatomic, strong) NSIndexPath* conversationIndex;
@@ -36,9 +37,16 @@
 
 +(instancetype)mappingItemForConversationIndex:(NSIndexPath *)conversationIndex{
     CCDisplayRowMappingItem* item = [[CCDisplayRowMappingItem alloc] init];
+    item.isContentConversationCell = NO;
     item.isExpandConversationCell = NO;
     item.isReplyToConversationCell = NO;
     item.conversationIndex = conversationIndex;
+    return item;
+}
+
++ (instancetype)contentMappingItemForConversationIndex:(NSIndexPath *)conversationIndex{
+    CCDisplayRowMappingItem* item = [self mappingItemForConversationIndex:conversationIndex];
+    item.isContentConversationCell = YES;
     return item;
 }
 

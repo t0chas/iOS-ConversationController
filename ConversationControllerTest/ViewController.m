@@ -198,10 +198,16 @@
 }
 
 -(Comment*)buildComment:(NSString*)message nReplies:(NSInteger)nReplies{
+    NSInteger n = [self randomMin:0 max:1];
+    return [self buildComment:message nReplies:nReplies hasContent:(n % 2 == 0)];
+}
+
+-(Comment*)buildComment:(NSString*)message nReplies:(NSInteger)nReplies hasContent:(BOOL)hasContent{
     Comment* comment;
     Comment* reply;
     comment = [Comment new];
     comment.message = message;
+    comment.hasContent = hasContent;
     for(int i=0; i< nReplies; i++){
         reply = [Comment new];
         reply.message = [NSString stringWithFormat:@"\t %@ - reply %d", comment.message, i];
@@ -275,6 +281,20 @@
     UITableViewCell<ConversationTableCell>* cell = [self.tableView dequeueReusableCellWithIdentifier:@"level1"];
     Comment* comment = [self getComment:conversationIndex];
     cell.textLabel.text = comment.message;
+    return cell;
+}
+
+- (BOOL)conversationController:(ConversationController *)controller conversationItemAtIndexHasContent:(NSIndexPath *)conversationIndex{
+    Comment* comment = [self getComment:conversationIndex];
+    if(comment){
+        return comment.hasContent;
+    }
+    return NO;
+}
+
+- (UITableViewCell<ConversationTableCell> *)conversationController:(ConversationController *)controller contentCellForConversationIndex:(NSIndexPath *)conversationIndex{
+    UITableViewCell<ConversationTableCell>* cell = [self.tableView dequeueReusableCellWithIdentifier:@"content"];
+    //Comment* comment = [self getComment:conversationIndex];
     return cell;
 }
 

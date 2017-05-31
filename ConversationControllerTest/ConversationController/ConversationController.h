@@ -40,16 +40,20 @@ typedef NS_ENUM(NSInteger, ConversationControllerConversationFlow) {
 
 -(UITableViewCell<ConversationTableCell>*)conversationController:(ConversationController*) controller expandConversationCellForConversationIndex:(NSIndexPath*)conversationIndex;
 
--(UITableViewCell<ConversationTableCell>*)conversationController:(ConversationController*) controller replyCellForConversationIndex:(NSIndexPath*)conversationIndex;
-
 -(UITableViewCell<ConversationTableCell>*)conversationController:(ConversationController*) controller cellAtConversationIndex:(NSIndexPath*)conversationIndex;
 
 @optional
+-(BOOL)conversationController:(ConversationController*) controller conversationItemAtIndexHasContent:(NSIndexPath*)conversationIndex;
+
+-(UITableViewCell<ConversationTableCell>*)conversationController:(ConversationController*) controller contentCellForConversationIndex:(NSIndexPath*)conversationIndex;
+
 -(BOOL)conversationController:(ConversationController*) controller canReplyToConversationItemAtIndex:(NSIndexPath*)conversationIndex;
+
+-(UITableViewCell<ConversationTableCell>*)conversationController:(ConversationController*) controller replyCellForConversationIndex:(NSIndexPath*)conversationIndex;
 
 -(CGFloat)conversationController:(ConversationController*) controller estimatedHeightForConversationIndex:(NSIndexPath *)conversationIndex;
 
--(void)conversationController:(ConversationController*) controller prefetchDataForConversationIndex:(NSIndexPath*)conversationIndex isReply:(BOOL)isReply isExpandConversation:(BOOL)isExpand;
+-(void)conversationController:(ConversationController*) controller prefetchDataForConversationIndex:(NSIndexPath*)conversationIndex isContent:(BOOL)isContent isReply:(BOOL)isReply isExpandConversation:(BOOL)isExpand;
 
 @end
 

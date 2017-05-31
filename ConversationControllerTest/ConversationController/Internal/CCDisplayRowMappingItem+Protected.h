@@ -14,15 +14,6 @@
 
 @interface CCDisplayRowMappingItem (protected)
 
-/*@property (nonatomic, assign) BOOL isExpandConversationCell;
-@property (nonatomic, assign) BOOL isReplyToConversationCell;
-@property (nonatomic, strong) NSIndexPath* conversationIndex;*/
-
-/*@property (nonatomic, weak) CCDisplaySectionMapping* parent;
-@property (nonatomic, assign) NSInteger row;
-
-@property (nonatomic, strong) NSIndexPath* displayIndex;*/
-
 -(void)isRowMappingForSectionMapping:(CCDisplaySectionMapping*)sectionMapping atRow:(NSInteger)row;
 
 @end

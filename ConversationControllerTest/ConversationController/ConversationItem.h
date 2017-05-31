@@ -23,6 +23,7 @@
 @property (nonatomic, assign, readonly) BOOL hasChilds;
 @property (nonatomic, assign, readonly) BOOL isExpanded;
 @property (nonatomic, assign) BOOL isReplyable;
+@property (nonatomic, assign) BOOL hasContent;
 
 - (instancetype)initWithConversationIndex:(NSIndexPath*)conversationIndex;
 

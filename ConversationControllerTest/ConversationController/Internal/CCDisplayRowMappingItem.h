@@ -10,13 +10,15 @@
 #import "TSLinkedListItem.h"
 
 @interface CCDisplayRowMappingItem : NSObject /*TSLinkedListItem*/
-                                                
+
+@property (nonatomic, assign, readonly) BOOL isContentConversationCell;
 @property (nonatomic, assign, readonly) BOOL isExpandConversationCell;
 @property (nonatomic, assign, readonly) BOOL isReplyToConversationCell;
 @property (nonatomic, strong, readonly) NSIndexPath* conversationIndex;
 @property (nonatomic, strong, readonly) NSIndexPath* displayIndex;
 
 +(instancetype)mappingItemForConversationIndex:(NSIndexPath *)conversationIndex;
++(instancetype)contentMappingItemForConversationIndex:(NSIndexPath *)conversationIndex;
 +(instancetype)replyMappingItemForConversationIndex:(NSIndexPath *)conversationIndex;
 +(instancetype)expandMappingItemForConversationIndex:(NSIndexPath *)conversationIndex;
 

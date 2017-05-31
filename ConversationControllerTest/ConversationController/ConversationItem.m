@@ -19,6 +19,7 @@
 @property (nonatomic, assign) NSInteger showingN;
 
 @property (nonatomic, strong) NSIndexPath* displayIndex;
+@property (nonatomic, strong) NSIndexPath* displayContentIndex;
 @property (nonatomic, strong) NSIndexPath* displayExpandIndex;
 @property (nonatomic, strong) NSIndexPath* displayReplyIndex;
 @property (nonatomic, copy) NSArray<NSIndexPath*>* displayChildIndexes;
@@ -100,6 +101,8 @@
     NSMutableArray<NSIndexPath*>* indexes = [NSMutableArray new];
     if(self.displayIndex)
         [indexes addObject:self.displayIndex];
+    if(self.hasContent && self.displayContentIndex)
+        [indexes addObject:self.displayContentIndex];
     if(self.displayExpandIndex)
         [indexes addObject:self.displayExpandIndex];
     if(self.displayChildIndexes && self.displayChildIndexes.count)
