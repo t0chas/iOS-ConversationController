@@ -62,7 +62,9 @@
 
 -(void)buildConversation{
     //[self buildConversationBig];
-    [self buildConversationNormal];
+    //[self buildConversationNormal];
+    
+    [self performSelector:@selector(buildConversationStream) withObject:nil afterDelay:1.0f];
 }
 
 -(NSInteger)randomMin:(NSInteger)min max:(NSInteger)max{
@@ -81,6 +83,69 @@
         [self.comments addObject:comment];
     }
 }
+
+-(void)buildConversationStream{
+    self.comments = [NSMutableArray new];
+    
+    __block Comment* comment = nil;
+    double delayInSeconds = 0.1;
+    
+    NSInteger total = 1000;
+    //__block NSInteger delivered = 0;
+    
+    for (NSInteger i=0; i < total; i++) {
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            NSInteger replies = [self randomMin:2 max:1000];
+            comment = [self buildComment:[NSString stringWithFormat:@"Comment #%li", (long)i] nReplies:replies];
+            [self.comments addObject:comment];
+            
+            NSLog(@"buildConversationStream delivering post #%li", (long)i);
+            
+            NSIndexPath* indexPath = [NSIndexPath indexPathWithIndex:i];
+            [self.conversationCntroller conversationElementAddedAtConversationIndex:indexPath increaseItemsShowing:NO];
+            
+        });
+    }
+}
+
+/*-(void)buildConversationStream{
+    self.comments = [NSMutableArray new];
+ 
+    __block Comment* comment = nil;
+    double delayInSeconds = 0.1;
+    
+    NSInteger total = 1000;
+    __block NSInteger delivered = 0;
+    
+    __block void (^weakBurstDispatch)() = nil;
+    __block void (^burstDispatch)() = nil;
+    burstDispatch = ^{
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            
+            NSInteger n = [self randomMin:1 max:5];;
+            for (NSInteger i=0; i < n; i++) {
+                NSInteger replies = [self randomMin:2 max:1000];
+                comment = [self buildComment:[NSString stringWithFormat:@"Comment #%li", (long)delivered] nReplies:replies];
+                [self.comments addObject:comment];
+                
+                NSLog(@"buildConversationStream delivering post #%li", (long)delivered);
+                
+                NSIndexPath* indexPath = [NSIndexPath indexPathWithIndex:delivered];
+                [self.conversationCntroller conversationElementAddedAtConversationIndex:indexPath increaseItemsShowing:NO];
+                delivered++;
+            }
+            if(delivered < total)
+                weakBurstDispatch();
+        });
+    };
+    weakBurstDispatch = burstDispatch;
+    
+    burstDispatch();
+}*/
 
 -(void)buildConversationNormal{
     self.comments = [NSMutableArray new];

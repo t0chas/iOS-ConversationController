@@ -41,18 +41,33 @@
 }
 
 -(void)addSectionMapping:(CCDisplaySectionMapping*)sectionMapping{
+    if(!self.childs)
+        return;
     //sectionMapping.parent = self;
-    [self.childs addObject:sectionMapping];
+    @synchronized (self) {
+        [self.childs addObject:sectionMapping];
+    }
 }
 
 - (void)insertSectionMapping:(CCDisplaySectionMapping *)sectionMapping atIndex:(NSUInteger)index{
+    if(!self.childs)
+        return;
     //sectionMapping.parent = self;
-    [self.childs insertObject:sectionMapping atIndex:index];
+    @synchronized (self) {
+        [self.childs insertObject:sectionMapping atIndex:index];
+    }
 #warning TODO setDirty
 }
 
 - (CCDisplaySectionMapping *)sectionMappingAtIndex:(NSInteger)index{
-    CCDisplaySectionMapping* sectionMapping = (CCDisplaySectionMapping*)[self.childs objectAtIndex:index];
+    CCDisplaySectionMapping* sectionMapping = nil;
+    @synchronized (self) {
+        if(!self.childs)
+            return nil;
+        if(index >= self.childs.count)
+            return nil;
+        sectionMapping = (CCDisplaySectionMapping*)[self.childs objectAtIndex:index];
+    }
     return sectionMapping;
 }
 
