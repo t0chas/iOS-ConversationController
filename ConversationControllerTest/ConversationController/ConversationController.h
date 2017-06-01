@@ -70,5 +70,6 @@ typedef NS_ENUM(NSInteger, ConversationControllerConversationFlow) {
 -(void)conversationElementAddedAtConversationIndex:(NSIndexPath*)conversationIndex increaseItemsShowing:(BOOL)increaseItemsShowing;
 
 -(void)refreshDisplayAtConversationIndex:(NSIndexPath*)conversationIndex;
+-(void)refreshDisplayForContentAtConversationIndex:(NSIndexPath*)conversationIndex;
 
 @end

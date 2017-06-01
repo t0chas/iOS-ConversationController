@@ -94,6 +94,8 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
 
 @property (atomic, strong) CCConversationChangesBuffer* changesBuffer;
 
+@property (nonatomic, strong) NSMutableDictionary<NSIndexPath*, NSNumber*>* cellHeights;
+
 @end
 
 @implementation ConversationController
@@ -105,6 +107,7 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
         self.conversation = [[Conversation alloc] init];
         self.operationQueue = [[NSOperationQueue alloc] init];
         self.operationQueue.maxConcurrentOperationCount = 1;
+        self.cellHeights = [[NSMutableDictionary alloc] init];
         
         self.levels = levels;
         self.tableView = tableView;
@@ -457,7 +460,7 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
         CCDisplayRowMappingItem* contentMappingItem = [CCDisplayRowMappingItem contentMappingItemForConversationIndex:conversationItem.conversationIndex];
         row = sectionMapping.count;
         [sectionMapping insertRowMapping:contentMappingItem atRow:row];
-        conversationItem.displayExpandIndex = contentMappingItem.displayIndex;
+        conversationItem.displayContentIndex = contentMappingItem.displayIndex;
         [displayIndexes addObject:contentMappingItem.displayIndex];
     }
     
@@ -549,18 +552,49 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
     }
 }
 
+-(void)refreshDisplayForContentAtConversationIndex:(NSIndexPath*)conversationIndex{
+    [self refreshDisplay:NO refreshContent:YES atConversationIndex:conversationIndex];
+}
+
 -(void)refreshDisplayAtConversationIndex:(NSIndexPath*)conversationIndex{
-    CCDisplayRowMappingItem* item = [self mappingFromConversationIndex:conversationIndex];
-    if(!item)
+    [self refreshDisplay:YES refreshContent:NO atConversationIndex:conversationIndex];
+}
+
+-(void)refreshDisplay:(BOOL)refreshDisplay refreshContent:(BOOL)refreshContent atConversationIndex:(NSIndexPath*)conversationIndex{
+    if(!conversationIndex)
         return;
-    if(!item.displayIndex)
+    if(!refreshDisplay && !refreshContent)
+        return;
+    
+    ConversationItem* conversationItem = [self.conversation conversationItemAtConversationIndex:conversationIndex];
+    if(!conversationItem)
+        return;
+    
+    NSMutableArray<NSIndexPath*>* indexes = [NSMutableArray new];
+    if(refreshDisplay && conversationItem.displayIndex){
+        [indexes addObject:conversationItem.displayIndex];
+    }
+    if(refreshContent && conversationItem.displayContentIndex){
+        [indexes addObject:conversationItem.displayContentIndex];
+    }
+    if(indexes.count == 0)
         return;
     
     void(^reloadTable)() = ^{
-#warning might need to reload other dependent cells (reply, expand and so on)
         if(!self.tableView)
             return;
-        [self.tableView reloadRowsAtIndexPaths:@[item.displayIndex] withRowAnimation:UITableViewRowAnimationFade];
+#if DEBUG
+        NSLog(@"ConversationController refreshDisplay:refreshContent:atConversationIndex: %@, display: %@, content: %@ indexes: [%@]", conversationIndex, refreshDisplay? @"YES": @"NO", refreshContent? @"YES": @"NO", indexes);
+#endif
+        @try {
+            //[self.tableView beginUpdates];
+            [self.tableView reloadRowsAtIndexPaths:indexes withRowAnimation:UITableViewRowAnimationFade];
+            //[self.tableView endUpdates];
+        } @catch (NSException *exception) {
+            NSLog(@"processChangesBuffer Exception:\n%@\n\n%@\n-------------------------------", exception, exception.callStackSymbols);
+        } @finally {
+            
+        }
     };
     
     NSOperationQueue* currentQueue = [NSOperationQueue currentQueue];
@@ -581,7 +615,7 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
     if(!self.displayMapping)
         return 0;
 #if DEBUG
-    NSLog(@"ConversationController numberOfSectionsInTableView: %li", self.displayMapping.count);
+    //NSLog(@"ConversationController numberOfSectionsInTableView: %li", self.displayMapping.count);
 #endif
     return self.displayMapping.count;
 }
@@ -595,7 +629,7 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
     if(!sectionMapping)
         return 0;
 #if DEBUG
-    NSLog(@"ConversationController numberOfSectionsInTableView: %li", sectionMapping.count);
+    //NSLog(@"ConversationController numberOfSectionsInTableView: %li", sectionMapping.count);
 #endif
     return sectionMapping.count;
 }
@@ -631,7 +665,7 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
 - (void)tableView:(UITableView *)tableView prefetchRowsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths{
     if(!self.delegate)
         return;
-    if(![self.delegate respondsToSelector:@selector(conversationController:prefetchDataForConversationIndex:isReply:isExpandConversation:)])
+    if(![self.delegate respondsToSelector:@selector(conversationController:prefetchDataForConversationIndex:isContent:isReply:isExpandConversation:)])
         return;
     for (NSIndexPath* indexPath in indexPaths) {
         CCDisplayRowMappingItem* item = [self mappingFromDisplayIndex:indexPath];
@@ -659,11 +693,23 @@ typedef NS_ENUM(NSInteger, CCConversationOperation) {
     }
 }
 
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+    CGFloat height = cell.frame.size.height;
+    NSNumber* heightRef = [NSNumber numberWithFloat:height];
+    [self.cellHeights setObject:heightRef forKey:indexPath];
+}
+
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSNumber* heightRef = [self.cellHeights objectForKey:indexPath];
+    if(heightRef){
+        return heightRef.floatValue;
+    }
+    
     CCDisplayRowMappingItem* item = [self mappingFromDisplayIndex:indexPath];
     if (item && self.delegate && [self.delegate respondsToSelector:@selector(conversationController:estimatedHeightForConversationIndex:)]) {
         return [self.delegate conversationController:self estimatedHeightForConversationIndex:item.conversationIndex];
     }
+    return UITableViewAutomaticDimension;
     if(self.tableView.estimatedRowHeight > 0)
         return self.tableView.estimatedRowHeight;
     return 44.0f;
